@@ -71,6 +71,7 @@ class gpt2Model:
         #모델의 어텐션 헤드 수
         self.n_head = None
         #모델의 레이어 수
+        #[질문] 레이어 수가 뭐지? 트랜스포머 모델에서 레이어는 무엇을 의미하나요?
         self.n_layer = None
         #키 벡터 저장소
         self.k_memory = None
@@ -96,6 +97,43 @@ class gpt2Model:
         self.tensors = {}
         #각 텐서 데이터의 차원 정보를 저장하기 위한 딕셔너리
         self.shapes = {}
+        
+        list_vars = tf.train.list_variables(dir_model)
+        for tensor_name, shape in list_vars:
+            print("loading variable %s" % tensor_name)
+            data = tf.train.load_variable(dir_model, tensor_name)
+            #[질문] 해당 변수들만 트랜스포즈 하는 이유는? squeeze를 하는 이유는? 
+            #모델을 만들때 애초에 스퀴즈해서 저장하면 되는거 아닌지?
+            transpose_list = ["/attn/c_attn/w", "/attn/c_proj/w", "/mlp/c_fc/w", "/mlp/c_proj/w"]
+            if np.any([tensor_name.endswith(x) for x in transpose_list]):
+                data = data.squeeze(0)
+            shape = data.shape
+            print("proccessing variable %s with shape %s" % (tensor_name, shape))
+            #[질문] tensor_name에 model/ 경로가 있는지는 어떻게 알수있는지? 일반적인 다른 모델에서도 동일하게 적용되는 부분인지
+            tensor_name = tensor_name.split("model/")[1]
+            self.tensors[tensor_name] = data
+        self.shapes = {key : tensor.shape for (key, tensor) in self.tensors.items()}
+        print("processing done")
+
+    def forward(self, tokens, n_past):
+        #헤드 수를 로컬 변수로 저장
+        _head = self.n_head
+        #모델의 임베딩 벡터의 차원수를 로컬 변수로 저장
+        n_embd = self.n_embd
+        #입력 토큰의 길이를 계산
+        n = len(tokens)
+        #토큰의 위치 인덱스를 저장할 배열을 초기화
+        pos_indices = np.zeros(n, dtype=np.int32)
+        #[질문] n_past가 무엇을 의미하는지 모르겠습니다. 
+        #[질문] 그리고 포지션 벡터에 i 번째임을 저장하는 거라 생각했는데 n_past를 더하는 이유가 뭔가요?
+        for i in range(n):
+            pos_indices[i] = i + n_past
+
+
+
+            
+
+
 
         
 
