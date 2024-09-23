@@ -76,7 +76,7 @@ class gpt2Model:
         # 모델의 어텐션 헤드 수
         self.n_head = None
         # 모델의 레이어 수
-        # [질문] 레이어 수가 뭐지? 트랜스포머 모델에서 레이어는 무엇을 의미하나요?
+        # [질문] 레이어는 인코더의 갯수를 말하는게 맞나요?
         self.n_layer = None
         # 키 벡터 저장소
         self.k_memory = None
