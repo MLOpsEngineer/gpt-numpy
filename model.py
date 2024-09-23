@@ -144,6 +144,7 @@ class gpt2Model:
             pos_indices[i] = i + n_past
         # [질문]n_past를 더해서 위치 벡터에는 단순히 i위치가 아니라 i+n_past의 값을 가질텐데 tensor에서 위치 임베딩 값을 가져오는게 정확한건지?
         # 그냥 i로 저장된 벡터를 tensors["wpe"][0,1,...,n-1]로 가져와야한다고 생각했는데 이 부분이 이해가 안갑니다
+        # [추가 질문] n_embd이 아래에 pos와 토큰 임베딩에서는 알 수가 없는데 어떻게 사용하는지 궁금합니다.
         pos_emb = self.tensors["wpe"][pos_indices]
         token_emb = self.tensors["wte"][tokens]
         input_layer = token_emb + pos_emb
